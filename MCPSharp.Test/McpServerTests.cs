@@ -32,7 +32,7 @@ namespace MCPSharp.Test
         [TestMethod("Start and Stop lifecycle")]
         public void Test_StartStop()
         {
-            var port = 19100 + Random.Shared.Next(100);
+            var port = TestPortAllocator.GetPort();
             using var server = new McpServer("Test", "1.0.0");
             server.Register<MCPDev>();
             server.Start("localhost", port);
@@ -46,7 +46,7 @@ namespace MCPSharp.Test
         [TestMethod("Dispose stops server")]
         public void Test_Dispose()
         {
-            var port = 19200 + Random.Shared.Next(100);
+            var port = TestPortAllocator.GetPort();
             var server = new McpServer("Test", "1.0.0");
             server.Start("localhost", port);
             server.Dispose();
@@ -57,7 +57,7 @@ namespace MCPSharp.Test
         [TestMethod("RegisterAssembly discovers tools")]
         public void Test_RegisterAssembly()
         {
-            var port = 19300 + Random.Shared.Next(100);
+            var port = TestPortAllocator.GetPort();
             using var server = new McpServer("AssemblyTest", "1.0.0");
             server.RegisterAssembly(typeof(MCPDev).Assembly);
             server.Start("localhost", port);
@@ -82,7 +82,7 @@ namespace MCPSharp.Test
         [TestMethod("RunAsync stops on cancellation")]
         public async Task Test_RunAsyncCancellation()
         {
-            var port = 19400 + Random.Shared.Next(100);
+            var port = TestPortAllocator.GetPort();
             var server = new McpServer("RunAsyncTest", "1.0.0");
             var cts = new CancellationTokenSource();
 
@@ -101,7 +101,7 @@ namespace MCPSharp.Test
         [TestMethod("DispatchWrapper wraps request handling")]
         public async Task Test_DispatchWrapper()
         {
-            var port = 19500 + Random.Shared.Next(100);
+            var port = TestPortAllocator.GetPort();
             bool wrapperCalled = false;
 
             using var server = new McpServer("WrapperTest", "1.0.0");
@@ -126,7 +126,7 @@ namespace MCPSharp.Test
         [TestMethod("Log callback is invoked")]
         public void Test_LogCallback()
         {
-            var port = 19600 + Random.Shared.Next(100);
+            var port = TestPortAllocator.GetPort();
             var messages = new List<string>();
 
             using var server = new McpServer("LogTest", "1.0.0");
@@ -140,7 +140,7 @@ namespace MCPSharp.Test
         [TestMethod("Double Start is ignored")]
         public void Test_DoubleStart()
         {
-            var port = 19700 + Random.Shared.Next(100);
+            var port = TestPortAllocator.GetPort();
             var messages = new List<string>();
 
             using var server = new McpServer("DoubleStart", "1.0.0");

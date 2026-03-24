@@ -59,6 +59,7 @@ namespace MCPSharp.Test
     }
 
     [TestClass]
+    [DoNotParallelize]
     public sealed class StdioTransportTests
     {
         private static McpServer _server = null!;
