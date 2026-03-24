@@ -1,0 +1,11 @@
+{
+    "name": "com.sharpminmcp.server",
+    "version": "1.0.0",
+    "displayName": "SharpMinMCP",
+    "description": "Minimal MCP (Model Context Protocol) server for C# and Unity. Exposes tools to AI assistants via Streamable HTTP or stdio. Ported from MCPSharp (MIT). No external runtimes, single dependency (Newtonsoft.Json).",
+    "unity": "2020.3",
+    "keywords": ["mcp", "ai", "tools", "json-rpc", "http"],
+    "dependencies": {
+        "com.unity.nuget.newtonsoft-json": "3.0.0"
+    }
+}
