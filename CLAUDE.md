@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-MCPSharp is a .NET library for implementing the Model Context Protocol (MCP). It provides both server and client implementations using JSON-RPC over stdio and SSE transports.
+MCPSharp is a lightweight .NET library for implementing MCP (Model Context Protocol) servers. It provides HTTP and stdio transports with an attribute-based API, targeting .NET and Unity.
 
 ## Build Commands
 
@@ -26,21 +26,24 @@ dotnet pack MCPSharp/MCPSharp.csproj --configuration Release
 
 ### Core Components
 
-- **MCPServer** (`MCPSharp/Core/MCPServer.cs`) — Singleton server that discovers tools via attributes, manages JSON-RPC communication over stdio, and handles tool registration/invocation. Entry point is `MCPServer.StartAsync()`.
-- **MCPClient** (`MCPSharp/Core/MCPClient.cs`) — Spawns a server process and communicates via JSON-RPC. Supports tool listing/calling, resource listing, and exporting tools as `AIFunction` objects (Microsoft.Extensions.AI).
-- **ServerRpcTarget** (`MCPSharp/Core/ServerRpcTarget.cs`) — Implements MCP protocol methods (`initialize`, `tools/list`, `tools/call`, `resources/list`, `prompts/list`, `ping`) as `[JsonRpcMethod]` handlers.
+- **McpServer** (`MCPSharp/Core/McpServer.cs`) — Main server class with builder pattern. Entry points: `Start()`, `RunAsync()`, `RunStdioAsync()`.
+- **McpRouter** (`MCPSharp/Core/McpRouter.cs`) — Stateless JSON-RPC 2.0 router. Handles `initialize`, `tools/list`, `tools/call`, `resources/list`, `ping`, etc.
+- **ToolManager** (`MCPSharp/Core/ToolManager.cs`) — Scans types for `[McpTool]` methods, extracts parameter schemas via reflection and XML doc comments (LoxSmoke.DocXml).
+- **ToolHandler** (`MCPSharp/Core/ToolHandler.cs`) — Invokes tools via reflection, handles async/sync methods and JSON parameter deserialization.
+- **ResourceManager** (`MCPSharp/Core/ResourceManager.cs`) — Scans types for `[McpResource]` methods/properties.
+- **JsonSchemaGenerator** (`MCPSharp/Core/JsonSchemaGenerator.cs`) — Maps C# types to JSON Schema for tool parameter definitions.
 
-### Tool System
+### Transport Layer (`MCPSharp/Transport/`)
 
-- **ToolManager** (`MCPSharp/Core/Tools/ToolManager.cs`) — Scans assemblies for tools using three attribute types: `[McpTool]`, `[McpFunction]` (deprecated), and `[KernelFunction]` (Semantic Kernel). Extracts parameter schemas from method signatures and XML doc comments.
-- **ToolHandler** (`MCPSharp/Core/Tools/ToolHandler.cs`) — Invokes tools via reflection, handling async/sync methods and JSON parameter deserialization to proper types.
-- **ResourceManager** — Integrated into ToolManager; manages `[McpResource]`-annotated properties/methods.
+- **IMcpTransport** — Transport interface
+- **HttpListenerTransport** — HTTP transport using System.Net.HttpListener (no ASP.NET)
+- **StdioTransport** — Stdio-based newline-delimited JSON-RPC
 
-### Transport Layer (`MCPSharp/Core/Transport/`)
+### Unity Integration (`MCPSharp/Unity/`)
 
-- **DuplexPipe** — Bidirectional pipe using System.IO.Pipelines
-- **StdioTransportPipe** — Stdio-based transport for process communication
-- **SSETransportPipe** — Server-Sent Events transport for HTTP
+- **MainThreadDispatcher** — Dispatches work to Unity's main thread
+- **McpServerBehaviour** — MonoBehaviour wrapper for McpServer
+- Both files are behind `#if UNITY_5_3_OR_NEWER`
 
 ### Attribute API
 
@@ -49,27 +52,17 @@ dotnet pack MCPSharp/MCPSharp.csproj --configuration Release
 | `[McpTool]` | Marks a class or method as an MCP tool (name, description optional) |
 | `[McpParameter]` | Configures method parameters (required, description) |
 | `[McpResource]` | Marks properties/methods as MCP resources (name, uri, mimeType, description) |
-| `[McpFunction]` | Deprecated — use `[McpTool]` instead |
-
-Semantic Kernel's `[KernelFunction]` and `[Description]` attributes are also auto-discovered.
 
 ### Key Dependencies
 
-- **StreamJsonRpc** — JSON-RPC protocol implementation
-- **Microsoft.Extensions.AI** — AIFunction abstraction for tool export
-- **Microsoft.SemanticKernel.Abstractions** — Semantic Kernel attribute support
+- **Newtonsoft.Json** — JSON serialization
+- **LoxSmoke.DocXml** — XML documentation comment parsing
+- **PolySharp** — C# language polyfills (compile-time only)
 
 ## Test Framework
 
-Tests use **MSTest** in `MCPSharp.Test/`. Key test files:
-- `STDIOTransportTests.cs` — Tool listing, calling, dynamic tools, exception handling
-- `ClientTests.cs` — Client initialization and communication
-- `AIFunctionAbstractionTests.cs` — Microsoft.Extensions.AI integration
-- `SSETransportTests.cs` — SSE transport testing
-
-## Release Process
-
-Releases are triggered manually via the `release.yml` GitHub Actions workflow with a version number input. The workflow builds, tests, packs, publishes to NuGet, and creates a GitHub release.
+Tests use **MSTest** in `MCPSharp.Test/`. Key test file:
+- `HttpTransportTests.cs` — HTTP transport integration tests (starts server, sends JSON-RPC via HttpClient)
 
 ## Branching
 

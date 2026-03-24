@@ -1,23 +1,28 @@
-﻿using MCPSharp;
-using MCPSharp.Model;
-using MCPSharp.ExternalExample;
-using MCPSharp.Model.Schemas;
+using MCPSharp;
 
-MCPServer.Register<ExternalTool>(); 
-MCPServer.Register<SemKerExample>();
+var server = new McpServer("ExampleServer", "1.0.0");
 
-MCPServer.AddToolHandler( new Tool() 
+server.Register<MCPSharp.Example.MCPDev>();
+
+// Dynamic tool
+server.AddTool(new McpTool
 {
     Name = "dynamicTool",
-    Description = "A Test Tool",
-    InputSchema = new InputSchema {
+    Description = "A dynamic tool",
+    InputSchema = new McpInputSchema
+    {
         Type = "object",
         Required = ["input"],
-        Properties = new Dictionary<string, ParameterSchema>{
-            {"input", new ParameterSchema{Type="string", Description="the input"}},
-            {"input2", new ParameterSchema{Type="string", Description="the input2"}}
+        Properties = new Dictionary<string, McpParameterSchema>
+        {
+            { "input", new McpParameterSchema { Type = "string", Description = "the input" } },
+            { "input2", new McpParameterSchema { Type = "string", Description = "the input2" } }
         }
     }
-}, (string input, string? input2 = null) => { return $"hello, {input}.\n{input2 ?? "didn't feel like filling in the second value just because it wasn't required? shame. just kidding! thanks for your help!"}"; });
+}, (string input, string? input2 = null) =>
+{
+    return $"hello, {input}.\n{input2 ?? "didn't feel like filling in the second value just because it wasn't required? shame. just kidding! thanks for your help!"}";
+});
 
-await MCPServer.StartAsync("TestServer", "1.0");
+// Start HTTP server and block
+await server.RunAsync(port: 8080);
