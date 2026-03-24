@@ -27,3 +27,14 @@ jobs:
 
     - name: Test
       run: dotnet test --no-build --configuration Release --verbosity normal
+
+    - name: Build Unity DLL
+      run: |
+        dotnet restore MCPSharp/MCPSharp.csproj -p:Configuration=Unity
+        dotnet build MCPSharp/MCPSharp.csproj --configuration Unity --no-restore
+
+    - name: Upload Unity DLL
+      uses: actions/upload-artifact@v4
+      with:
+        name: MCPSharp.Unity
+        path: MCPSharp/bin/Unity/netstandard2.0/MCPSharp.dll
