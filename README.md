@@ -1,14 +1,17 @@
 # MCPSharp
 
-Lightweight [Model Context Protocol](https://modelcontextprotocol.io) (MCP) server for **.NET** and **Unity**. Attribute-based API, HTTP and stdio transports, minimal dependencies.
+Lightweight [Model Context Protocol](https://modelcontextprotocol.io) (MCP) server and client for **.NET** and **Unity**. Attribute-based API, HTTP and stdio transports, minimal dependencies.
 
 ## Features
 
 - `[McpTool]` / `[McpResource]` attribute API — mark methods and your server is ready
+- **MCP Client** — connect to any MCP server via HTTP or stdio (child process)
 - **HTTP transport** (Streamable HTTP, MCP 2025-03-26 spec) via `System.Net.HttpListener` — no ASP.NET required
 - **Stdio transport** for editor integrations and piped communication
 - **Unity-compatible** — netstandard2.0, no IL2CPP-breaking dependencies, main-thread dispatch included
+- **Cross-assembly tool loading** — register tools from external DLLs
 - Dynamic tool registration at runtime
+- Permission gate on client tool calls
 - XML doc comment support for tool/parameter descriptions (via [LoxSmoke.DocXml](https://github.com/loxsmoke/DocXml))
 - Complex object parameters with automatic JSON Schema generation
 
@@ -126,6 +129,54 @@ server.Stop();                                 // Stop server
 | HTTP | `HttpListenerTransport` | Web clients, cross-process, Unity |
 | Stdio | `StdioTransport` | Editor integrations, piped I/O |
 | Custom | Implement `IMcpTransport` | Your own transport |
+
+## MCP Client
+
+Connect to any MCP server over HTTP or by spawning a child process:
+
+```csharp
+// HTTP client
+var client = new McpClient("MyClient", "1.0.0",
+    new Uri("http://localhost:8080/mcp"));
+await client.InitializeAsync();
+
+var tools = await client.GetToolsAsync();
+var result = await client.CallToolAsync("echo",
+    new Dictionary<string, object> { { "input", "hello" } });
+Console.WriteLine(result.Content[0].Text);
+
+// Stdio client (spawns process)
+var stdioClient = new McpClient("MyClient", "1.0.0",
+    "dotnet", "path/to/server.dll");
+await stdioClient.InitializeAsync();
+```
+
+### Permission Gate
+
+```csharp
+client.GetPermission = (parameters) =>
+{
+    Console.WriteLine($"Tool: {parameters["tool"]}");
+    Console.Write("Allow? (y/N) ");
+    return Console.ReadKey().Key == ConsoleKey.Y;
+};
+```
+
+## Cross-Assembly Tools
+
+Register tools from external DLLs:
+
+```csharp
+// In ExternalTools.dll
+public class MyExternalTool
+{
+    [McpTool("external-tool", "A tool from another assembly")]
+    public static string Run() => "success";
+}
+
+// In your server
+server.Register<MyExternalTool>();
+```
 
 ## XML Documentation Support
 

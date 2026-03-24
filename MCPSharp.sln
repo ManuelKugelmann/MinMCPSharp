@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MCPSharp.Example", "MCPShar
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MCPSharp.Test", "MCPSharp.Test\MCPSharp.Test.csproj", "{EAAC2C18-8A35-4CED-B407-582170A7A0F9}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MCPSharp.ExternalExample", "MCPSharp.ExternalExample\MCPSharp.ExternalExample.csproj", "{6B4E00C3-6CAF-4493-9A4D-9AE602FA9E00}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{EAAC2C18-8A35-4CED-B407-582170A7A0F9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EAAC2C18-8A35-4CED-B407-582170A7A0F9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EAAC2C18-8A35-4CED-B407-582170A7A0F9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6B4E00C3-6CAF-4493-9A4D-9AE602FA9E00}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6B4E00C3-6CAF-4493-9A4D-9AE602FA9E00}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6B4E00C3-6CAF-4493-9A4D-9AE602FA9E00}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6B4E00C3-6CAF-4493-9A4D-9AE602FA9E00}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,8 +1,10 @@
 using MCPSharp;
+using MCPSharp.ExternalExample;
 
 var server = new McpServer("ExampleServer", "1.0.0");
 
 server.Register<MCPSharp.Example.MCPDev>();
+server.Register<ExternalTool>(); // Cross-assembly tool registration
 
 // Dynamic tool
 server.AddTool(new McpTool

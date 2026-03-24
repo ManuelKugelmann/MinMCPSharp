@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-MCPSharp is a lightweight .NET library for implementing MCP (Model Context Protocol) servers. It provides HTTP and stdio transports with an attribute-based API, targeting .NET and Unity.
+MCPSharp is a lightweight .NET library for implementing MCP (Model Context Protocol) servers and clients. It provides HTTP and stdio transports with an attribute-based API, targeting .NET and Unity.
 
 ## Build Commands
 
@@ -32,6 +32,7 @@ dotnet pack MCPSharp/MCPSharp.csproj --configuration Release
 - **ToolHandler** (`MCPSharp/Core/ToolHandler.cs`) — Invokes tools via reflection, handles async/sync methods and JSON parameter deserialization.
 - **ResourceManager** (`MCPSharp/Core/ResourceManager.cs`) — Scans types for `[McpResource]` methods/properties.
 - **JsonSchemaGenerator** (`MCPSharp/Core/JsonSchemaGenerator.cs`) — Maps C# types to JSON Schema for tool parameter definitions.
+- **McpClient** (`MCPSharp/Core/McpClient.cs`) — MCP client supporting HTTP and stdio (child process) connections. Permission gate support.
 
 ### Transport Layer (`MCPSharp/Transport/`)
 
@@ -61,8 +62,10 @@ dotnet pack MCPSharp/MCPSharp.csproj --configuration Release
 
 ## Test Framework
 
-Tests use **MSTest** in `MCPSharp.Test/`. Key test file:
+Tests use **MSTest** in `MCPSharp.Test/`. Key test files:
 - `HttpTransportTests.cs` — HTTP transport integration tests (starts server, sends JSON-RPC via HttpClient)
+- `McpClientTests.cs` — Client tests (initializes McpClient against a local server)
+- `StdioTransportTests.cs` — Stdio transport tests with piped streams
 
 ## Branching
 
