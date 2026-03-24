@@ -33,7 +33,7 @@ namespace MCPSharp
         // -- Static factory -----------------------------------------------
 
         public static McpServerBehaviour Create(string name = "MCPSharp",
-            string version = "1.0.0", int port = 8080)
+            string version = "1.0.0", int port = 8080, string endpoint = "localhost")
         {
             var go = new GameObject("[MCPSharp-Server]");
             DontDestroyOnLoad(go);
@@ -41,6 +41,7 @@ namespace MCPSharp
             behaviour.serverName = name;
             behaviour.serverVersion = version;
             behaviour.port = port;
+            behaviour.endpoint = endpoint;
             behaviour.startOnAwake = false;
             return behaviour;
         }
