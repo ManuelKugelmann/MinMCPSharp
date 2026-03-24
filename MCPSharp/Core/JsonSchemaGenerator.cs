@@ -32,7 +32,8 @@ namespace MCPSharp
         /// </summary>
         public static JObject GenerateObjectSchema(Type type)
         {
-            if (type == null) return null;
+            if (type == null)
+                throw new ArgumentNullException(nameof(type));
 
             var jsonType = GetJsonType(type);
             if (jsonType != "object") return null;

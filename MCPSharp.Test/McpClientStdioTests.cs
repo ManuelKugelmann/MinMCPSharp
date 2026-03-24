@@ -27,12 +27,12 @@ namespace MCPSharp.Test
             Assert.IsTrue(File.Exists(_serverDllPath),
                 $"StdioTestServer not found at: {_serverDllPath}. Run 'dotnet build --configuration Release' first.");
 
-            // Find dotnet executable
+            // Find dotnet executable - fail immediately if not found
             _dotnetPath = Path.Combine(
                 Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
                 ".dotnet", "dotnet");
-            if (!File.Exists(_dotnetPath))
-                _dotnetPath = "dotnet"; // fall back to PATH
+            Assert.IsTrue(File.Exists(_dotnetPath),
+                $"dotnet not found at {_dotnetPath}. Install the .NET SDK first.");
         }
 
         private McpClient CreateStdioClient()

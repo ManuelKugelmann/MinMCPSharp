@@ -75,7 +75,8 @@ namespace MCPSharp
                 if (line == null) break;
                 if (string.IsNullOrWhiteSpace(line)) continue;
 
-                if (RequestHandler == null) continue;
+                if (RequestHandler == null)
+                    throw new InvalidOperationException("RequestHandler is not set. Wire the transport before starting.");
 
                 try
                 {

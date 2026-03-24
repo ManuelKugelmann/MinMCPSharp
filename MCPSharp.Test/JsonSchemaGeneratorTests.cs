@@ -122,10 +122,11 @@ namespace MCPSharp.Test
 
         // -- GenerateObjectSchema tests ---------------------------------------
 
-        [TestMethod("GenerateObjectSchema - null returns null")]
+        [TestMethod("GenerateObjectSchema - null throws ArgumentNullException")]
         public void Test_GenerateObjectSchema_Null()
         {
-            Assert.IsNull(JsonSchemaGenerator.GenerateObjectSchema(null));
+            Assert.ThrowsException<ArgumentNullException>(
+                () => JsonSchemaGenerator.GenerateObjectSchema(null!));
         }
 
         [TestMethod("GenerateObjectSchema - non-object returns null")]

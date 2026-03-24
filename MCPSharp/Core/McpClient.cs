@@ -128,9 +128,10 @@ namespace MCPSharp
         public async Task<List<McpTool>> GetToolsAsync(CancellationToken ct = default)
         {
             var result = await SendRpcAsync("tools/list", null, ct);
-            var toolsArray = result?["tools"] as JArray;
-            if (toolsArray != null)
-                Tools = toolsArray.ToObject<List<McpTool>>();
+            var toolsArray = result?["tools"] as JArray
+                ?? throw new McpClientException(
+                    "Server returned invalid tools/list response: missing 'tools' array", -32603);
+            Tools = toolsArray.ToObject<List<McpTool>>();
             return Tools;
         }
 
@@ -156,11 +157,9 @@ namespace MCPSharp
                 arguments = parameters
             }, ct);
 
-            return result?.ToObject<McpCallToolResult>() ?? new McpCallToolResult
-            {
-                IsError = true,
-                Content = new[] { new McpTextContent("No response from server") }
-            };
+            return result.ToObject<McpCallToolResult>()
+                ?? throw new McpClientException(
+                    "Failed to deserialize tools/call response", -32603);
         }
 
         // -- Resource operations ------------------------------------------
@@ -169,10 +168,9 @@ namespace MCPSharp
         public async Task<McpResourcesListResult> GetResourcesAsync(CancellationToken ct = default)
         {
             var result = await SendRpcAsync("resources/list", null, ct);
-            return result?.ToObject<McpResourcesListResult>() ?? new McpResourcesListResult
-            {
-                Resources = new List<McpResource>()
-            };
+            return result.ToObject<McpResourcesListResult>()
+                ?? throw new McpClientException(
+                    "Failed to deserialize resources/list response", -32603);
         }
 
         // -- Prompt operations --------------------------------------------
@@ -181,7 +179,9 @@ namespace MCPSharp
         public async Task<JObject> GetPromptListAsync(CancellationToken ct = default)
         {
             var result = await SendRpcAsync("prompts/list", null, ct);
-            return result as JObject ?? new JObject(new JProperty("prompts", new JArray()));
+            return result as JObject
+                ?? throw new McpClientException(
+                    "Failed to deserialize prompts/list response", -32603);
         }
 
         // -- Ping ---------------------------------------------------------
@@ -211,7 +211,9 @@ namespace MCPSharp
                 ? await SendHttpAsync(request, ct)
                 : await SendStdioAsync(request, ct);
 
-            if (responseJson == null) return null;
+            if (responseJson == null)
+                throw new McpClientException(
+                    "No response received from server for method: " + method, -32603);
 
             var response = JObject.Parse(responseJson);
 
@@ -264,6 +266,9 @@ namespace MCPSharp
 
             // Read response line
             var line = await _stdoutReader.ReadLineAsync();
+            if (line == null)
+                throw new McpClientException(
+                    "Server process closed stdout unexpectedly", -32603);
             return line;
         }
 
