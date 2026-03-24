@@ -6,9 +6,21 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 MCPSharp is a lightweight .NET library for implementing MCP (Model Context Protocol) servers and clients. It provides HTTP and stdio transports with an attribute-based API, targeting .NET and Unity.
 
+## Sandbox Setup
+
+The .NET SDK is not pre-installed in the sandbox. Install it before building:
+
+```bash
+curl -sSL https://dot.net/v1/dotnet-install.sh -o /tmp/dotnet-install.sh
+chmod +x /tmp/dotnet-install.sh
+/tmp/dotnet-install.sh --channel 9.0
+export PATH="$HOME/.dotnet:$PATH"
+```
+
 ## Build Commands
 
 ```bash
+export PATH="$HOME/.dotnet:$PATH"  # if not already set
 dotnet restore
 dotnet build --no-restore --configuration Release
 dotnet test --no-build --configuration Release --verbosity normal
@@ -28,7 +40,7 @@ dotnet pack MCPSharp/MCPSharp.csproj --configuration Release
 
 - **McpServer** (`MCPSharp/Core/McpServer.cs`) — Main server class with builder pattern. Entry points: `Start()`, `RunAsync()`, `RunStdioAsync()`.
 - **McpRouter** (`MCPSharp/Core/McpRouter.cs`) — Stateless JSON-RPC 2.0 router. Handles `initialize`, `tools/list`, `tools/call`, `resources/list`, `ping`, etc.
-- **ToolManager** (`MCPSharp/Core/ToolManager.cs`) — Scans types for `[McpTool]` methods, extracts parameter schemas via reflection and XML doc comments (LoxSmoke.DocXml).
+- **ToolManager** (`MCPSharp/Core/ToolManager.cs`) — Scans types for `[McpTool]` methods, extracts parameter schemas via reflection.
 - **ToolHandler** (`MCPSharp/Core/ToolHandler.cs`) — Invokes tools via reflection, handles async/sync methods and JSON parameter deserialization.
 - **ResourceManager** (`MCPSharp/Core/ResourceManager.cs`) — Scans types for `[McpResource]` methods/properties.
 - **JsonSchemaGenerator** (`MCPSharp/Core/JsonSchemaGenerator.cs`) — Maps C# types to JSON Schema for tool parameter definitions.
@@ -57,7 +69,6 @@ dotnet pack MCPSharp/MCPSharp.csproj --configuration Release
 ### Key Dependencies
 
 - **Newtonsoft.Json** — JSON serialization
-- **LoxSmoke.DocXml** — XML documentation comment parsing
 - **PolySharp** — C# language polyfills (compile-time only)
 
 ## Test Framework
