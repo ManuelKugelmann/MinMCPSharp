@@ -1,9 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
 using System.Reflection;
-using LoxSmoke.DocXml;
 
 namespace MCPSharp
 {
@@ -19,10 +17,6 @@ namespace MCPSharp
         /// </summary>
         public void Register(Type type)
         {
-            DocXmlReader docReader = null;
-            try { docReader = new DocXmlReader(type.Assembly); }
-            catch { /* XML docs may not be available */ }
-
             foreach (var method in type.GetMethods(BindingFlags.Public | BindingFlags.Static |
                                                     BindingFlags.Instance | BindingFlags.DeclaredOnly))
             {
@@ -31,26 +25,17 @@ namespace MCPSharp
 
                 var name = attr.Name ?? method.Name;
 
-                // Description priority: attribute > XML doc > [Description] attribute
+                // Description priority: attribute > [Description]
                 string description = attr.Description;
-                if (string.IsNullOrEmpty(description) && docReader != null)
-                {
-                    try { description = docReader.GetMethodComments(method)?.Summary; }
-                    catch { }
-                }
                 if (string.IsNullOrEmpty(description))
                     description = method.GetCustomAttribute<DescriptionAttribute>()?.Description ?? "";
 
                 var paramSchemas = new Dictionary<string, McpParameterSchema>();
                 var required = new List<string>();
 
-                var methodComments = docReader != null
-                    ? TryGetMethodComments(docReader, method)
-                    : null;
-
                 foreach (var param in method.GetParameters())
                 {
-                    var schema = BuildParameterSchema(param, methodComments);
+                    var schema = BuildParameterSchema(param);
                     paramSchemas[param.Name] = schema;
                     if (schema.Required)
                         required.Add(param.Name);
@@ -83,22 +68,15 @@ namespace MCPSharp
             OnToolsChanged();
         }
 
-        private McpParameterSchema BuildParameterSchema(ParameterInfo param, MethodComments methodComments)
+        private McpParameterSchema BuildParameterSchema(ParameterInfo param)
         {
             var jsonType = JsonSchemaGenerator.GetJsonType(param.ParameterType);
 
             var mcpAttr = param.GetCustomAttribute<McpParameterAttribute>();
             var descAttr = param.GetCustomAttribute<DescriptionAttribute>();
 
-            // Parameter description: attribute > XML doc > [Description]
+            // Parameter description: attribute > [Description]
             string paramDoc = mcpAttr?.Description;
-            if (string.IsNullOrEmpty(paramDoc) && methodComments != null)
-            {
-                var xmlParam = methodComments.Parameters
-                    .FirstOrDefault(p => p.Name == param.Name);
-                if (xmlParam.Name != null)
-                    paramDoc = xmlParam.Text;
-            }
             if (string.IsNullOrEmpty(paramDoc))
                 paramDoc = descAttr?.Description ?? "";
 
@@ -113,12 +91,6 @@ namespace MCPSharp
             };
 
             return schema;
-        }
-
-        private static MethodComments TryGetMethodComments(DocXmlReader reader, MethodInfo method)
-        {
-            try { return reader.GetMethodComments(method); }
-            catch { return null; }
         }
     }
 }
