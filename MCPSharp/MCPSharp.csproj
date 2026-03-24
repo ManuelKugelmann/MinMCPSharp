@@ -2,100 +2,38 @@
 
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;net8.0;net9.0</TargetFrameworks>
-	<LangVersion>13.0</LangVersion>	
+    <LangVersion>13.0</LangVersion>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>disable</Nullable>
-	  
+
     <!-- Package Metadata -->
     <PackageId>MCPSharp</PackageId>
-    <Version>0.9.13</Version>
+    <Version>1.0.0</Version>
     <Authors>Allen Frise</Authors>
-    <Company></Company>
     <Title>MCPSharp - Model Context Protocol for .NET</Title>
-    <Description>Build Model Context Protocol (MCP) servers and clients in .NET with MCPSharp. 
-
-Create MCP-compliant tools and functions that AI models can discover and use. 
-Features easy to use attribute-based API allowing anyone to spin up a server in minutes, 
-and a Microsoft.Extensions.AI compatible client that generates AIFunctions, 
-ready to be consumed by any IChatClient or compatible system.
-
-
-await MCPServer.StartAsync("EchoServer", "1.0.0");
-
---- server:
-class MyTool 
-{
-    [McpTool("echo","returns the input string back to you")]
-    public string echo(string input) =&gt; input;
-}
-
----client:
-var client = new MCPClient("MyClient","1.0.0", "EchoServer.exe" //or dotnet EchoServer.dll if you wish
-await client.CallToolAsync("echo", new Dictionary&lt;string, object&gt;{{"input", "input string to echo"}});</Description>
-	<PackageIcon>icon.png</PackageIcon>
-    <!-- Package Tags -->
-    <PackageTags>mcp;sharp;mcpsharp;mcp-sharp;mcp#;ai;machine-learning;json-rpc;api;tools;claude;anthropic;model-context-protocol;tool-calling;model;context;protocol;server;mcp-server;modelcontextprotocol;mcpserver;standard;</PackageTags>
-    <!-- Repository Info -->
-    <RepositoryUrl>https://github.com/afrise/MCPSharp</RepositoryUrl>
+    <Description>Lightweight MCP server for .NET and Unity. Attribute-based API, HTTP and stdio transports, zero heavy dependencies.</Description>
+    <PackageTags>mcp;mcpsharp;ai;json-rpc;tools;model-context-protocol;server;unity</PackageTags>
+    <RepositoryUrl>https://github.com/manuelkugelmann/mcpsharp</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
-	<PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <PackageProjectUrl>https://github.com/afrise/MCPSharp</PackageProjectUrl>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <PackageReleaseNotes>* Microsoft.Extensions.AI Integration: MCPSharp now integrates with Microsoft.Extensions.AI, allowing tools to be exposed as AIFunctions
-* Semantic Kernel Support: Add tools using Semantic Kernel's KernelFunctionAttribute
-* Dynamic Tool Registration: Register tools on-the-fly with custom implementation logic
-* Tool Change Notifications: Server now notifies clients when tools are added, updated, or removed
-* Complex Object Parameter Support: Better handling of complex objects in tool parameters
-* Better Error Handling: Improved error handling with detailed stack traces</PackageReleaseNotes>
-    <AssemblyVersion>0.9.13</AssemblyVersion>
-    <FileVersion>0.9.13</FileVersion>
+    <PackageProjectUrl>https://github.com/manuelkugelmann/mcpsharp</PackageProjectUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <AnalysisLevel>latest</AnalysisLevel>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net9.0|AnyCPU'">
-    <WarningLevel>8</WarningLevel>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net9.0|AnyCPU'">
-    <WarningLevel>8</WarningLevel>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netstandard2.0|AnyCPU'">
-    <WarningLevel>8</WarningLevel>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|netstandard2.0|AnyCPU'">
-    <WarningLevel>8</WarningLevel>
-  </PropertyGroup>
-
   <ItemGroup>
-    <None Include="..\README.md">
-      <Pack>True</Pack>
-      <PackagePath>\</PackagePath>
-    </None>
+    <None Include="..\README.md" Pack="true" PackagePath="\" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Server.Kestrel" Version="2.3.0" />
-    <PackageReference Include="Microsoft.Extensions.AI" Version="9.6.0" />
-    <PackageReference Include="Microsoft.Extensions.AI.Abstractions" Version="9.6.0" />
-    <PackageReference Include="Microsoft.SemanticKernel.Abstractions" Version="1.57.0" />
+    <PackageReference Include="LoxSmoke.DocXml" Version="3.8.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="PolySharp" Version="1.15.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="StreamJsonRpc" Version="2.22.11" />
     <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
   </ItemGroup>
-
-  <ItemGroup>
-	  <None Include="icon.png" Pack="true" PackagePath="\">
-		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-	  </None>
-  </ItemGroup>
-
-  <ProjectExtensions><VisualStudio><UserProperties jrpc-schema_1json__JsonSchema="" /></VisualStudio></ProjectExtensions>
 
 </Project>

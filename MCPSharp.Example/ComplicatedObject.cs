@@ -1,22 +1,22 @@
-﻿using System.Text.Json.Serialization;
+using Newtonsoft.Json;
 
 namespace MCPSharp.Example
 {
     /// <summary>
     /// A complicated object
     /// </summary>
-    public class ComplicatedObject()
+    public class ComplicatedObject
     {
         /// <summary>The name of the object</summary>
-        [JsonPropertyName("name")]
+        [JsonProperty("name")]
         public string Name { get; set; } = "";
 
         /// <summary>The age of the object</summary>
-        [JsonPropertyName("age")]
+        [JsonProperty("age")]
         public int Age { get; set; } = 0;
 
         /// <summary>The hobbies of the object</summary>
-        [JsonPropertyName("hobbies")]
+        [JsonProperty("hobbies")]
         public string[] Hobbies { get; set; } = [];
     }
 }

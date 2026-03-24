@@ -1,45 +1,27 @@
-[![Build](https://github.com/afrise/MCPSharp/actions/workflows/build.yml/badge.svg)](https://github.com/afrise/MCPSharp/actions/workflows/build.yml)
-[![NuGet](https://img.shields.io/nuget/v/MCPSharp)](https://www.nuget.org/packages/MCPSharp)
-[![NuGet Downloads](https://img.shields.io/nuget/dt/MCPSharp)](https://www.nuget.org/packages/MCPSharp)
-
 # MCPSharp
 
-MCPSharp is a .NET library that helps you build Model Context Protocol (MCP) servers and clients - the standardized API protocol used by AI assistants and models. With MCPSharp, you can:
-
-- Create MCP-compliant tools and functions that AI models can discover and use
-- Connect directly to existing MCP servers from C# code with an easy to use client
-- Expose your .NET methods as MCP endpoints with simple attributes
-- Handle MCP protocol details and JSON-RPC communication seamlessly
-
-## 🚀 What's New in MCPSharp
-
-- **Microsoft.Extensions.AI Integration**: MCPSharp now integrates with Microsoft.Extensions.AI, allowing tools to be exposed as AIFunctions
-- **Semantic Kernel Support**: Add tools using Semantic Kernel's KernelFunctionAttribute
-- **Dynamic Tool Registration**: Register tools on-the-fly with custom implementation logic
-- **Tool Change Notifications**: Server now notifies clients when tools are added, updated, or removed
-- **Complex Object Parameter Support**: Better handling of complex objects in tool parameters
-- **Better Error Handling**: Improved error handling with detailed stack traces
-
-## When to Use MCPSharp
-
-Use MCPSharp when you want to:
-- Create tools that AI assistants like Anthropic's Claude Desktop can use
-- Build MCP-compliant APIs without dealing with the protocol details
-- Expose existing .NET code as MCP endpoints
-- Add AI capabilities to your applications through standardized interfaces
-- Integrate with Microsoft.Extensions.AI and/or Semantic Kernel without locking into a single vendor
+Lightweight [Model Context Protocol](https://modelcontextprotocol.io) (MCP) server and client for **.NET** and **Unity**. Attribute-based API, HTTP and stdio transports, minimal dependencies.
 
 ## Features
 
-- Easy-to-use attribute-based API (`[McpTool]`, `[McpResource]`)
-- Built-in JSON-RPC support with automatic request/response handling
-- Automatic parameter validation and type conversion
-- Rich documentation support through XML comments
-- Near zero configuration required for basic usage
+- `[McpTool]` / `[McpResource]` attribute API — mark methods and your server is ready
+- **MCP Client** — connect to any MCP server via HTTP or stdio (child process)
+- **HTTP transport** (Streamable HTTP, MCP 2025-03-26 spec) via `System.Net.HttpListener` — no ASP.NET required
+- **Stdio transport** for editor integrations and piped communication
+- **Unity-compatible** — netstandard2.0, no IL2CPP-breaking dependencies, main-thread dispatch included
+- **Cross-assembly tool loading** — register tools from external DLLs
+- Dynamic tool registration at runtime
+- Permission gate on client tool calls
+- XML doc comment support for tool/parameter descriptions (via [LoxSmoke.DocXml](https://github.com/loxsmoke/DocXml))
+- Complex object parameters with automatic JSON Schema generation
 
-## Prerequisites
+## Dependencies
 
-- Any version of .NET that supports [standard 2.0](https://learn.microsoft.com/en-us/dotnet/standard/net-standard?tabs=net-standard-2-0#tabpanel_1_net-standard-2-0)
+| Package | Purpose | Runtime deps |
+|---|---|---|
+| Newtonsoft.Json | JSON serialization | 0 |
+| LoxSmoke.DocXml | XML doc comment parsing | 0 |
+| PolySharp | C# 13 polyfills | compile-time only |
 
 ## Installation
 
@@ -49,156 +31,164 @@ dotnet add package MCPSharp
 
 ## Quick Start
 
-### 1. Define a Tool
-
-Create a class and mark your method(s) with the `[McpTool]` attribute:
+### 1. Define Tools
 
 ```csharp
 using MCPSharp;
 
 public class Calculator
 {
-    [McpTool("add", "Adds two numbers")]  // Note: [McpFunction] is deprecated, use [McpTool] instead
+    /// <summary>Adds two numbers together</summary>
+    /// <param name="a">First number</param>
+    /// <param name="b">Second number</param>
+    [McpTool]
     public static int Add([McpParameter(true)] int a, [McpParameter(true)] int b)
-    {
-        return a + b;
-    }
+        => a + b;
 }
 ```
 
-### 2. Start the Server
+### 2. Start the Server (HTTP)
 
 ```csharp
-await MCPServer.StartAsync("CalculatorServer", "1.0.0");
+using MCPSharp;
+
+var server = new McpServer("CalculatorServer", "1.0.0");
+server.Register<Calculator>();
+await server.RunAsync(port: 8080); // POST http://localhost:8080/mcp
 ```
 
-The StartAsync() method will automatically find any methods in the base assembly that are marked with the McpTool attribute. In order to add any methods that are in a referenced library, you can manually register them by calling `MCPServer.Register<T>();` with `T` being the class containing the desired methods. If your methods are marked with Semantic Kernel attributes, this will work as well. If the client supports list changed notifications, it will be notified when additional tools are registered.
-
-## Advanced Usage
-
-### Dynamic Tool Registration
-
-Register tools dynamically with custom implementation:
+### 3. Start the Server (Stdio)
 
 ```csharp
-MCPServer.AddToolHandler(new Tool() 
+await server.RunStdioAsync();
+```
+
+## Dynamic Tool Registration
+
+```csharp
+server.AddTool(new McpTool
 {
-    Name = "dynamicTool",
-    Description = "A dynamic tool",
-    InputSchema = new InputSchema {
+    Name = "greet",
+    Description = "Greets a user",
+    InputSchema = new McpInputSchema
+    {
         Type = "object",
-        Required = ["input"],
-        Properties = new Dictionary<string, ParameterSchema>{
-            {"input", new ParameterSchema{Type="string", Description="Input value"}}
+        Required = ["name"],
+        Properties = new Dictionary<string, McpParameterSchema>
+        {
+            { "name", new McpParameterSchema { Type = "string", Description = "User name" } }
         }
     }
-}, (string input) => { return $"You provided: {input}"; });
+}, (string name) => $"Hello, {name}!");
 ```
 
-### Use with Microsoft.Extensions.AI
+## Unity Integration
+
+MCPSharp includes Unity-specific components behind `#if UNITY_5_3_OR_NEWER`:
 
 ```csharp
-// Client-side integration
-MCPClient client = new("AIClient", "1.0", "path/to/mcp/server");
-IList<AIFunction> functions = await client.GetFunctionsAsync();
+// Option A: Inspector-driven
+// Add McpServerBehaviour to a GameObject, configure in Inspector
+
+// Option B: Code-driven
+var behaviour = McpServerBehaviour.Create("MyGame", "1.0.0", port: 8080);
+behaviour.Register<MyGameTools>();
+behaviour.StartServer();
 ```
-This list can be plugged into the [ChatOptions.Tools](https://learn.microsoft.com/en-us/dotnet/api/microsoft.extensions.ai.chatoptions?view=net-9.0-pp) property for an [IChatClient](https://learn.microsoft.com/en-us/dotnet/api/microsoft.extensions.ai.ichatclient?view=net-9.0-pp), Allowing MCP servers to be used seamlessly with Any IChatClient Implementation.
 
+The `McpServerBehaviour` handles lifecycle (Awake/OnDestroy) and optionally dispatches tool calls to Unity's main thread via `MainThreadDispatcher`.
 
-### Semantic Kernel Integration
-
-```csharp
-using Microsoft.SemanticKernel;
-
-public class MySkillClass
-{
-    [KernelFunction("MyFunction")]
-    [Description("Description of my function")]
-    public string MyFunction(string input) => $"Processed: {input}";
-}
-
-// Register with MCPServer
-MCPServer.Register<MySkillClass>();
-```
-Currently, This is the only way to make a Semantic kernel method registerable with the MCP server. If you have a use case that is not covered here, please reach out!
-
+**Platform support:** The HTTP transport uses `System.Net.HttpListener`, which works on Windows and macOS desktop builds (both Mono and IL2CPP). For mobile or WebGL targets where `HttpListener` is unavailable, a `TcpListenerTransport` with raw HTTP parsing could be added in the future.
 
 ## API Reference
 
 ### Attributes
 
-- `[McpTool]` - Marks a class or method as an MCP tool
-    -  Optional parameters:
-        - `Name` - The tool name (default: class/method name)
-        - `Description` - Description of the tool
+| Attribute | Target | Properties |
+|---|---|---|
+| `[McpTool]` | Method, Class | `Name`, `Description` |
+| `[McpParameter]` | Parameter | `Required`, `Description` |
+| `[McpResource]` | Method, Property | `Name`, `Uri`, `MimeType`, `Description` |
 
-- `[McpParameter]` - Provides metadata for function parameters
-    - Optional parameters:
-        - `Description` - Parameter description
-        - `Required` - Whether the parameter is required (default: false)
+### McpServer
 
-- `[McpResource]` - Marks a property or method as an MCP resource
-    - Parameters:
-        - `Name` - Resource name
-        - `Uri` - Resource URI (can include templates)
-        - `MimeType` - MIME type of the resource
-        - `Description` - Resource description
+```csharp
+var server = new McpServer(name, version);
+server.Register<T>();                          // Register tool/resource class
+server.RegisterAssembly(assembly);             // Scan assembly for attributed types
+server.AddTool(tool, delegate);                // Register dynamic tool
+server.Start(endpoint, port);                  // Start HTTP (non-blocking)
+server.Start(transport, endpoint, port);       // Start with custom transport
+await server.RunAsync(port: 8080);             // Start HTTP and block
+await server.RunStdioAsync();                  // Start stdio and block
+server.Stop();                                 // Stop server
+```
 
-### Server Methods
+### Transports
 
-- `MCPServer.StartAsync(string serverName, string version)` - Starts the MCP server
-- `MCPServer.Register<T>()` - Registers a class containing tools or resources
-- `MCPServer.AddToolHandler(Tool tool, Delegate func)` - Registers a dynamic tool
+| Transport | Class | Use Case |
+|---|---|---|
+| HTTP | `HttpListenerTransport` | Web clients, cross-process, Unity |
+| Stdio | `StdioTransport` | Editor integrations, piped I/O |
+| Custom | Implement `IMcpTransport` | Your own transport |
 
-### Client Methods
+## MCP Client
 
-- `new MCPClient(string name, string version, string server, string args = null, IDictionary<string, string> env = null)` - Create a client instance
-- `client.GetToolsAsync()` - Get available tools
-- `client.CallToolAsync(string name, Dictionary<string, object> parameters)` - Call a tool
-- `client.GetResourcesAsync()` - Get available resources
-- `client.GetFunctionsAsync()` - Get tools as AIFunctions
+Connect to any MCP server over HTTP or by spawning a child process:
+
+```csharp
+// HTTP client
+var client = new McpClient("MyClient", "1.0.0",
+    new Uri("http://localhost:8080/mcp"));
+await client.InitializeAsync();
+
+var tools = await client.GetToolsAsync();
+var result = await client.CallToolAsync("echo",
+    new Dictionary<string, object> { { "input", "hello" } });
+Console.WriteLine(result.Content[0].Text);
+
+// Stdio client (spawns process)
+var stdioClient = new McpClient("MyClient", "1.0.0",
+    "dotnet", "path/to/server.dll");
+await stdioClient.InitializeAsync();
+```
+
+### Permission Gate
+
+```csharp
+client.GetPermission = (parameters) =>
+{
+    Console.WriteLine($"Tool: {parameters["tool"]}");
+    Console.Write("Allow? (y/N) ");
+    return Console.ReadKey().Key == ConsoleKey.Y;
+};
+```
+
+## Cross-Assembly Tools
+
+Register tools from external DLLs:
+
+```csharp
+// In ExternalTools.dll
+public class MyExternalTool
+{
+    [McpTool("external-tool", "A tool from another assembly")]
+    public static string Run() => "success";
+}
+
+// In your server
+server.Register<MyExternalTool>();
+```
 
 ## XML Documentation Support
 
-MCPSharp automatically extracts documentation from XML comments:
-
-```csharp
-/// <summary>
-/// Provides mathematical operations
-/// </summary>
-public class Calculator
-{
-    /// <summary>
-    /// Adds two numbers together
-    /// </summary>
-    /// <param name="a">The first number to add</param>
-    /// <param name="b">The second number to add</param>
-    /// <returns>The sum of the two numbers</returns>
-    [McpTool]
-    public static int Add(
-        [McpParameter(true)] int a,
-        [McpParameter(true)] int b)
-    {
-        return a + b;
-    }
-}
-```
-
-Enable XML documentation in your project file:
+MCPSharp automatically extracts tool and parameter descriptions from XML doc comments. Enable in your `.csproj`:
 
 ```xml
 <PropertyGroup>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <NoWarn>$(NoWarn);1591</NoWarn>
 </PropertyGroup>
 ```
-
-This allows you to be able to quickly change the names and descriptions of your MCP tools without having to recompile.  For example, if you find the model is having trouble understanding how to use it correctly.
-
-## Migration Notes
-
-- `[McpFunction]` is deprecated and replaced with `[McpTool]` for better alignment with MCP standards
-- Use `MCPServer.Register<T>()` instead of `MCPServer.RegisterTool<T>()` for consistency (old method still works but is deprecated)
 
 ## Contributing
 

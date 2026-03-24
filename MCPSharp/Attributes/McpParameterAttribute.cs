@@ -1,17 +1,17 @@
-﻿#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
-using System.Text.Json.Serialization;
+using System;
 
 namespace MCPSharp
 {
     [AttributeUsage(AttributeTargets.Parameter)]
-    public class McpParameterAttribute(bool required = false, string description = null) : Attribute
+    public class McpParameterAttribute : Attribute
     {
-        [JsonPropertyName("required")]
-        public bool Required { get; set; } = required;
+        public bool Required { get; set; }
+        public string Description { get; set; }
 
-        [JsonPropertyName("description")]
-        public string Description { get; set; } = description;
+        public McpParameterAttribute(bool required = false, string description = null)
+        {
+            Required = required;
+            Description = description;
+        }
     }
 }
-
-#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
