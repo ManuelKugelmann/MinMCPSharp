@@ -1,17 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <!-- Default (Debug/Release): multi-target -->
-  <PropertyGroup Condition="'$(Configuration)' != 'Unity'">
-    <TargetFrameworks>netstandard2.0;net8.0;net9.0</TargetFrameworks>
-  </PropertyGroup>
-
-  <!-- Unity: netstandard2.0 only, with Unity define -->
-  <PropertyGroup Condition="'$(Configuration)' == 'Unity'">
-    <TargetFramework>netstandard2.0</TargetFramework>
-    <DefineConstants>$(DefineConstants);UNITY_5_3_OR_NEWER</DefineConstants>
-  </PropertyGroup>
-
   <PropertyGroup>
+    <TargetFrameworks>netstandard2.0;net8.0;net9.0</TargetFrameworks>
     <LangVersion>13.0</LangVersion>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>disable</Nullable>
@@ -40,20 +30,18 @@
     <None Include="..\README.md" Pack="true" PackagePath="\" />
   </ItemGroup>
 
+  <!-- Exclude Unity drop-in scripts from library compilation -->
+  <ItemGroup>
+    <Compile Remove="Unity\**" />
+  </ItemGroup>
+
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-    <PackageReference Include="PolySharp" Version="1.15.0" Condition="!$(DefineConstants.Contains('UNITY_5_3_OR_NEWER'))">
+    <PackageReference Include="PolySharp" Version="1.15.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
-  </ItemGroup>
-
-  <!-- Compile-time-only reference to UnityEngine stubs for Unity config -->
-  <ItemGroup Condition="'$(Configuration)' == 'Unity'">
-    <ProjectReference Include="..\UnityEngine.Stubs\UnityEngine.Stubs.csproj">
-      <Private>false</Private>
-    </ProjectReference>
   </ItemGroup>
 
 </Project>
