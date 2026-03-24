@@ -34,7 +34,7 @@ jobs:
       run: dotnet pack MCPSharp/MCPSharp.csproj --no-build --configuration Release -p:PackageVersion=${{ github.event.inputs.version }} --output nupkgs
       
     - name: Push to NuGet
-      run: dotnet nuget push /home/runner/work/MCPSharp/MCPSharp/nupkgs/MCPSharp.${{ github.event.inputs.version }}.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
+      run: dotnet nuget push nupkgs/MCPSharp.${{ github.event.inputs.version }}.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
 
     - name: Publish Github release
       id: create_release
@@ -55,6 +55,6 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: /home/runner/work/MCPSharp/MCPSharp/nupkgs/MCPSharp.${{ github.event.inputs.version }}.nupkg
+        asset_path: nupkgs/MCPSharp.${{ github.event.inputs.version }}.nupkg
         asset_name: MCPSharp.${{ github.event.inputs.version }}.nupkg
         asset_content_type: application/zip
