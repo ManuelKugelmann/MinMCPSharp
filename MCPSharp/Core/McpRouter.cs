@@ -24,7 +24,7 @@ namespace MCPSharp
             Formatting = Formatting.None
         };
 
-        public McpRouter(ToolManager tools, ResourceManager resources, McpImplementation serverInfo)
+        internal McpRouter(ToolManager tools, ResourceManager resources, McpImplementation serverInfo)
         {
             _tools = tools;
             _resources = resources;

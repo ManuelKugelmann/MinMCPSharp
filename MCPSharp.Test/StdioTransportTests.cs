@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using System.Text;
 using MCPSharp;
 using MCPSharp.Example;
@@ -6,36 +7,87 @@ using Newtonsoft.Json.Linq;
 
 namespace MCPSharp.Test
 {
+    /// <summary>
+    /// A stream backed by a BlockingCollection that blocks on Read until data is available,
+    /// unlike MemoryStream which returns 0 (EOF) immediately.
+    /// </summary>
+    internal sealed class BlockingStream : Stream
+    {
+        private readonly BlockingCollection<byte[]> _chunks = new();
+        private byte[] _current = Array.Empty<byte>();
+        private int _offset;
+
+        public override bool CanRead => true;
+        public override bool CanSeek => false;
+        public override bool CanWrite => true;
+        public override long Length => throw new NotSupportedException();
+        public override long Position { get => throw new NotSupportedException(); set => throw new NotSupportedException(); }
+
+        public override int Read(byte[] buffer, int offset, int count)
+        {
+            if (_offset >= _current.Length)
+            {
+                try { _current = _chunks.Take(); }
+                catch (InvalidOperationException) { return 0; } // completed
+                _offset = 0;
+            }
+
+            int toCopy = Math.Min(count, _current.Length - _offset);
+            Buffer.BlockCopy(_current, _offset, buffer, offset, toCopy);
+            _offset += toCopy;
+            return toCopy;
+        }
+
+        public override void Write(byte[] buffer, int offset, int count)
+        {
+            var copy = new byte[count];
+            Buffer.BlockCopy(buffer, offset, copy, 0, count);
+            _chunks.Add(copy);
+        }
+
+        public override void Flush() { }
+        public override long Seek(long offset, SeekOrigin origin) => throw new NotSupportedException();
+        public override void SetLength(long value) => throw new NotSupportedException();
+
+        public void Complete() => _chunks.CompleteAdding();
+
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing) _chunks.Dispose();
+            base.Dispose(disposing);
+        }
+    }
+
     [TestClass]
     public sealed class StdioTransportTests
     {
         private static McpServer _server = null!;
-        private static MemoryStream _clientInput = null!;
-        private static MemoryStream _serverOutput = null!;
-        private static StreamWriter _writer = null!;
+        private static BlockingStream _toServer = null!;
+        private static BlockingStream _fromServer = null!;
         private static StreamReader _reader = null!;
 
         [ClassInitialize]
         public static void ClassInitialize(TestContext context)
         {
-            // Piped streams: client writes to clientInput, server reads from it
-            // Server writes to serverOutput, client reads from it
-            _clientInput = new MemoryStream();
-            _serverOutput = new MemoryStream();
+            _toServer = new BlockingStream();
+            _fromServer = new BlockingStream();
 
             _server = new McpServer("StdioTestServer", "1.0.0");
             _server.Register<MCPDev>();
 
-            var transport = new StdioTransport(_clientInput, _serverOutput);
+            var transport = new StdioTransport(_toServer, _fromServer);
             _server.Start(transport, "stdio", 0);
 
             // Give server time to start read loop
             Thread.Sleep(200);
+
+            _reader = new StreamReader(_fromServer, Encoding.UTF8);
         }
 
         [ClassCleanup]
         public static void ClassCleanup()
         {
+            _toServer?.Complete();
             _server?.Dispose();
         }
 
@@ -53,22 +105,12 @@ namespace MCPSharp.Test
             var json = request.ToString(Formatting.None);
             var bytes = Encoding.UTF8.GetBytes(json + "\n");
 
-            // Write to the stream the server reads from
-            lock (_clientInput)
-            {
-                _clientInput.Write(bytes, 0, bytes.Length);
-                _clientInput.Flush();
-            }
+            _toServer.Write(bytes, 0, bytes.Length);
+            _toServer.Flush();
 
-            // Wait for server to process
-            await Task.Delay(500);
-
-            // Read server output
-            _serverOutput.Position = 0;
-            var reader = new StreamReader(_serverOutput, Encoding.UTF8);
-            var responseLine = await reader.ReadLineAsync();
-            // Reset for next read
-            _serverOutput.SetLength(0);
+            // Read the response line (blocks until data arrives)
+            var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
+            var responseLine = await Task.Run(() => _reader.ReadLine(), cts.Token);
 
             Assert.IsNotNull(responseLine, "No response received from stdio transport");
             return JObject.Parse(responseLine);
