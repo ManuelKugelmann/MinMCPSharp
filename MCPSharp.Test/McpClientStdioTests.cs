@@ -12,7 +12,6 @@ namespace MCPSharp.Test
     public sealed class McpClientStdioTests
     {
         private static string _serverDllPath = null!;
-        private static string _dotnetPath = null!;
 
         [ClassInitialize]
         public static void ClassInit(TestContext ctx)
@@ -26,18 +25,13 @@ namespace MCPSharp.Test
 
             Assert.IsTrue(File.Exists(_serverDllPath),
                 $"StdioTestServer not found at: {_serverDllPath}. Run 'dotnet build --configuration Release' first.");
-
-            // Find dotnet executable - fail immediately if not found
-            _dotnetPath = Path.Combine(
-                Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
-                ".dotnet", "dotnet");
-            Assert.IsTrue(File.Exists(_dotnetPath),
-                $"dotnet not found at {_dotnetPath}. Install the .NET SDK first.");
         }
 
         private McpClient CreateStdioClient()
         {
-            return new McpClient("StdioTestClient", "1.0.0", _dotnetPath, _serverDllPath);
+            // "dotnet" is always on PATH when running inside dotnet test.
+            // ProcessStartInfo resolves it via PATH - no need to locate the binary.
+            return new McpClient("StdioTestClient", "1.0.0", "dotnet", _serverDllPath);
         }
 
         [TestMethod("Stdio client - initialize")]
