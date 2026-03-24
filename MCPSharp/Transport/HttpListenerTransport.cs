@@ -12,6 +12,14 @@ namespace MCPSharp
     /// Runs on a background thread. Unity-compatible (no ASP.NET).
     /// Implements the MCP 2025-03-26 Streamable HTTP spec:
     ///   POST /mcp -> JSON-RPC request -> JSON-RPC response
+    ///
+    /// Platform support:
+    ///   - Windows desktop (Mono and IL2CPP): fully supported
+    ///   - macOS desktop (Mono and IL2CPP): fully supported
+    ///   - Linux: fully supported
+    ///   - Mobile / WebGL: HttpListener is not available.
+    ///     A future TcpListenerTransport with raw HTTP parsing
+    ///     would cover these platforms if needed.
     /// </summary>
     public class HttpListenerTransport : IMcpTransport
     {

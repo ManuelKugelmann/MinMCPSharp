@@ -98,6 +98,8 @@ behaviour.StartServer();
 
 The `McpServerBehaviour` handles lifecycle (Awake/OnDestroy) and optionally dispatches tool calls to Unity's main thread via `MainThreadDispatcher`.
 
+**Platform support:** The HTTP transport uses `System.Net.HttpListener`, which works on Windows and macOS desktop builds (both Mono and IL2CPP). For mobile or WebGL targets where `HttpListener` is unavailable, a `TcpListenerTransport` with raw HTTP parsing could be added in the future.
+
 ## API Reference
 
 ### Attributes
