@@ -28,6 +28,9 @@ jobs:
     - name: Test
       run: dotnet test --no-build --configuration Release --verbosity normal
 
+    - name: Smoke test examples
+      run: dotnet test --no-build --configuration Release --verbosity normal --filter "FullyQualifiedName~ExampleSmokeTests"
+
     - name: Stage Unity package
       run: |
         mkdir -p unity-package/MinMCPSharp/Scripts

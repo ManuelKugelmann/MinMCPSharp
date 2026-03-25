@@ -56,7 +56,7 @@ dotnet pack MinMCPSharp/MinMCPSharp.csproj --configuration Release
 
 - **MainThreadDispatcher** — Dispatches work to Unity's main thread
 - **McpServerBehaviour** — MonoBehaviour wrapper for McpServer
-- Both files are behind `#if UNITY_5_3_OR_NEWER`
+- Both files are excluded from library compilation via `<Compile Remove="Unity\**" />` in the csproj (drop-in scripts for Unity projects)
 
 ### Attribute API
 
@@ -77,6 +77,8 @@ Tests use **MSTest** in `MinMCPSharp.Test/`. Key test files:
 - `HttpTransportTests.cs` — HTTP transport integration tests (starts server, sends JSON-RPC via HttpClient)
 - `McpClientTests.cs` — Client tests (initializes McpClient against a local server)
 - `StdioTransportTests.cs` — Stdio transport tests with piped streams
+- `ExampleSmokeTests.cs` — Standalone smoke tests that launch example executables as child processes
+- `IntegrationTests.cs` — End-to-end smoke tests via McpClient against in-process McpServer
 
 ## Branching
 
