@@ -30,12 +30,12 @@ jobs:
 
     - name: Stage Unity package
       run: |
-        mkdir -p unity-package/MCPSharp/Scripts
-        cp MCPSharp/bin/Release/netstandard2.0/MCPSharp.dll unity-package/MCPSharp/
-        cp MCPSharp/Unity/*.cs unity-package/MCPSharp/Scripts/
+        mkdir -p unity-package/MinMCPSharp/Scripts
+        cp MinMCPSharp/bin/Release/netstandard2.0/MinMCPSharp.dll unity-package/MinMCPSharp/
+        cp MinMCPSharp/Unity/*.cs unity-package/MinMCPSharp/Scripts/
 
     - name: Upload Unity package
       uses: actions/upload-artifact@v4
       with:
-        name: MCPSharp.Unity
-        path: unity-package/MCPSharp/
+        name: MinMCPSharp.Unity
+        path: unity-package/MinMCPSharp/
