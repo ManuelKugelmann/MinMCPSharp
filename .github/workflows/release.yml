@@ -27,26 +27,26 @@ jobs:
         dotnet-version: '9.0.x'
 
     - name: Restore dependencies
-      run: dotnet restore MCPSharp/MCPSharp.csproj
+      run: dotnet restore MinMCPSharp/MinMCPSharp.csproj
 
     - name: Build
-      run: dotnet build MCPSharp/MCPSharp.csproj --no-restore --configuration Release
+      run: dotnet build MinMCPSharp/MinMCPSharp.csproj --no-restore --configuration Release
 
     - name: Test
       run: dotnet test --no-build --configuration Release --verbosity normal
 
     - name: Pack
-      run: dotnet pack MCPSharp/MCPSharp.csproj --no-build --configuration Release -p:PackageVersion=${{ github.event.inputs.version }} --output nupkgs
+      run: dotnet pack MinMCPSharp/MinMCPSharp.csproj --no-build --configuration Release -p:PackageVersion=${{ github.event.inputs.version }} --output nupkgs
 
     # - name: Push to NuGet
-    #   run: dotnet nuget push nupkgs/MCPSharp.${{ github.event.inputs.version }}.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
+    #   run: dotnet nuget push nupkgs/MinMCPSharp.${{ github.event.inputs.version }}.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
 
     - name: Stage Unity package
       run: |
-        mkdir -p unity-package/MCPSharp/Scripts
-        cp MCPSharp/bin/Release/netstandard2.0/MCPSharp.dll unity-package/MCPSharp/
-        cp MCPSharp/Unity/*.cs unity-package/MCPSharp/Scripts/
-        cd unity-package && zip -r ../MCPSharp.Unity.${{ github.event.inputs.version }}.zip MCPSharp/
+        mkdir -p unity-package/MinMCPSharp/Scripts
+        cp MinMCPSharp/bin/Release/netstandard2.0/MinMCPSharp.dll unity-package/MinMCPSharp/
+        cp MinMCPSharp/Unity/*.cs unity-package/MinMCPSharp/Scripts/
+        cd unity-package && zip -r ../MinMCPSharp.Unity.${{ github.event.inputs.version }}.zip MinMCPSharp/
 
     - name: Publish Github release
       id: create_release
@@ -55,9 +55,9 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         tag_name: ${{ github.event.inputs.version }}
-        release_name: MCPSharp ${{ github.event.inputs.version }}
+        release_name: MinMCPSharp ${{ github.event.inputs.version }}
         body: |
-          Release of MCPSharp version ${{ github.event.inputs.version }}
+          Release of MinMCPSharp version ${{ github.event.inputs.version }}
         draft: false
         prerelease: ${{ github.event.inputs.prerelease }}
 
@@ -67,8 +67,8 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: nupkgs/MCPSharp.${{ github.event.inputs.version }}.nupkg
-        asset_name: MCPSharp.${{ github.event.inputs.version }}.nupkg
+        asset_path: nupkgs/MinMCPSharp.${{ github.event.inputs.version }}.nupkg
+        asset_name: MinMCPSharp.${{ github.event.inputs.version }}.nupkg
         asset_content_type: application/zip
 
     - name: Upload Unity package
@@ -77,6 +77,6 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: MCPSharp.Unity.${{ github.event.inputs.version }}.zip
-        asset_name: MCPSharp.Unity.${{ github.event.inputs.version }}.zip
+        asset_path: MinMCPSharp.Unity.${{ github.event.inputs.version }}.zip
+        asset_name: MinMCPSharp.Unity.${{ github.event.inputs.version }}.zip
         asset_content_type: application/zip

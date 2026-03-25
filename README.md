@@ -1,4 +1,4 @@
-# MCPSharp
+# MinMCPSharp
 
 Lightweight [Model Context Protocol](https://modelcontextprotocol.io) (MCP) server and client for **.NET** and **Unity**. Attribute-based API, HTTP and stdio transports, minimal dependencies.
 
@@ -26,7 +26,7 @@ Lightweight [Model Context Protocol](https://modelcontextprotocol.io) (MCP) serv
 ## Installation
 
 ```bash
-dotnet add package MCPSharp
+dotnet add package MinMCPSharp
 ```
 
 ## Quick Start
@@ -34,7 +34,7 @@ dotnet add package MCPSharp
 ### 1. Define Tools
 
 ```csharp
-using MCPSharp;
+using MinMCPSharp;
 
 public class Calculator
 {
@@ -50,7 +50,7 @@ public class Calculator
 ### 2. Start the Server (HTTP)
 
 ```csharp
-using MCPSharp;
+using MinMCPSharp;
 
 var server = new McpServer("CalculatorServer", "1.0.0");
 server.Register<Calculator>();
@@ -84,7 +84,7 @@ server.AddTool(new McpTool
 
 ## Unity Integration
 
-MCPSharp includes Unity-specific components behind `#if UNITY_5_3_OR_NEWER`:
+MinMCPSharp includes Unity-specific components behind `#if UNITY_5_3_OR_NEWER`:
 
 ```csharp
 // Option A: Inspector-driven
@@ -182,7 +182,7 @@ server.Register<MyExternalTool>();
 
 ## XML Documentation Support
 
-MCPSharp automatically extracts tool and parameter descriptions from XML doc comments. Enable in your `.csproj`:
+MinMCPSharp automatically extracts tool and parameter descriptions from XML doc comments. Enable in your `.csproj`:
 
 ```xml
 <PropertyGroup>

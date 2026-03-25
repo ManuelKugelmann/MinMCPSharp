@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-MCPSharp is a lightweight .NET library for implementing MCP (Model Context Protocol) servers and clients. It provides HTTP and stdio transports with an attribute-based API, targeting .NET and Unity.
+MinMCPSharp is a lightweight .NET library for implementing MCP (Model Context Protocol) servers and clients. It provides HTTP and stdio transports with an attribute-based API, targeting .NET and Unity.
 
 ## Sandbox Setup
 
@@ -26,10 +26,10 @@ dotnet build --no-restore --configuration Release
 dotnet test --no-build --configuration Release --verbosity normal
 
 # Run a single test
-dotnet test MCPSharp.Test --filter "FullyQualifiedName~TestMethodName" --configuration Release
+dotnet test MinMCPSharp.Test --filter "FullyQualifiedName~TestMethodName" --configuration Release
 
 # Create NuGet package
-dotnet pack MCPSharp/MCPSharp.csproj --configuration Release
+dotnet pack MinMCPSharp/MinMCPSharp.csproj --configuration Release
 ```
 
 ## Architecture
@@ -38,21 +38,21 @@ dotnet pack MCPSharp/MCPSharp.csproj --configuration Release
 
 ### Core Components
 
-- **McpServer** (`MCPSharp/Core/McpServer.cs`) — Main server class with builder pattern. Entry points: `Start()`, `RunAsync()`, `RunStdioAsync()`.
-- **McpRouter** (`MCPSharp/Core/McpRouter.cs`) — Stateless JSON-RPC 2.0 router. Handles `initialize`, `tools/list`, `tools/call`, `resources/list`, `ping`, etc.
-- **ToolManager** (`MCPSharp/Core/ToolManager.cs`) — Scans types for `[McpTool]` methods, extracts parameter schemas via reflection.
-- **ToolHandler** (`MCPSharp/Core/ToolHandler.cs`) — Invokes tools via reflection, handles async/sync methods and JSON parameter deserialization.
-- **ResourceManager** (`MCPSharp/Core/ResourceManager.cs`) — Scans types for `[McpResource]` methods/properties.
-- **JsonSchemaGenerator** (`MCPSharp/Core/JsonSchemaGenerator.cs`) — Maps C# types to JSON Schema for tool parameter definitions.
-- **McpClient** (`MCPSharp/Core/McpClient.cs`) — MCP client supporting HTTP and stdio (child process) connections. Permission gate support.
+- **McpServer** (`MinMCPSharp/Core/McpServer.cs`) — Main server class with builder pattern. Entry points: `Start()`, `RunAsync()`, `RunStdioAsync()`.
+- **McpRouter** (`MinMCPSharp/Core/McpRouter.cs`) — Stateless JSON-RPC 2.0 router. Handles `initialize`, `tools/list`, `tools/call`, `resources/list`, `ping`, etc.
+- **ToolManager** (`MinMCPSharp/Core/ToolManager.cs`) — Scans types for `[McpTool]` methods, extracts parameter schemas via reflection.
+- **ToolHandler** (`MinMCPSharp/Core/ToolHandler.cs`) — Invokes tools via reflection, handles async/sync methods and JSON parameter deserialization.
+- **ResourceManager** (`MinMCPSharp/Core/ResourceManager.cs`) — Scans types for `[McpResource]` methods/properties.
+- **JsonSchemaGenerator** (`MinMCPSharp/Core/JsonSchemaGenerator.cs`) — Maps C# types to JSON Schema for tool parameter definitions.
+- **McpClient** (`MinMCPSharp/Core/McpClient.cs`) — MCP client supporting HTTP and stdio (child process) connections. Permission gate support.
 
-### Transport Layer (`MCPSharp/Transport/`)
+### Transport Layer (`MinMCPSharp/Transport/`)
 
 - **IMcpTransport** — Transport interface
 - **HttpListenerTransport** — HTTP transport using System.Net.HttpListener (no ASP.NET)
 - **StdioTransport** — Stdio-based newline-delimited JSON-RPC
 
-### Unity Integration (`MCPSharp/Unity/`)
+### Unity Integration (`MinMCPSharp/Unity/`)
 
 - **MainThreadDispatcher** — Dispatches work to Unity's main thread
 - **McpServerBehaviour** — MonoBehaviour wrapper for McpServer
@@ -73,7 +73,7 @@ dotnet pack MCPSharp/MCPSharp.csproj --configuration Release
 
 ## Test Framework
 
-Tests use **MSTest** in `MCPSharp.Test/`. Key test files:
+Tests use **MSTest** in `MinMCPSharp.Test/`. Key test files:
 - `HttpTransportTests.cs` — HTTP transport integration tests (starts server, sends JSON-RPC via HttpClient)
 - `McpClientTests.cs` — Client tests (initializes McpClient against a local server)
 - `StdioTransportTests.cs` — Stdio transport tests with piped streams

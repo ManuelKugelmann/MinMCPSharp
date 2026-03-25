@@ -1,8 +1,8 @@
-# Contributing to MCPSharp
+# Contributing to MinMCPSharp
 
 ## Introduction
 
-Thank you for your interest in contributing to MCPSharp! This document outlines the process for contributing to the project.
+Thank you for your interest in contributing to MinMCPSharp! This document outlines the process for contributing to the project.
 
 ## Code of Conduct
 
@@ -12,7 +12,7 @@ By participating in this project, you agree to abide by our [Code of Conduct](CO
 
 ### Reporting Bugs
 
-If you find a bug, please open an issue and include detailed steps to reproduce the problem. Ensure the issue has not already been reported by searching the [issues list](https://github.com/afrise/MCPSharp/issues).
+If you find a bug, please open an issue and include detailed steps to reproduce the problem. Ensure the issue has not already been reported by searching the [issues list](https://github.com/afrise/MinMCPSharp/issues).
 
 ### Suggesting Enhancements
 
@@ -47,7 +47,7 @@ If your changes affect the project's documentation, please update it accordingly
 
 ## Acknowledgements
 
-We appreciate all contributions and thank you for your help in improving MCPSharp!
+We appreciate all contributions and thank you for your help in improving MinMCPSharp!
 
 ## Questions
 
