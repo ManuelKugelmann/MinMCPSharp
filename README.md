@@ -194,6 +194,10 @@ MinMCPSharp automatically extracts tool and parameter descriptions from XML doc 
 
 We welcome contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
+## Acknowledgements
+
+This project is derived from [afrise/MCPSharp](https://github.com/afrise/MCPSharp).
+
 ## License
 
 This project is licensed under the MIT License — see [LICENSE.txt](LICENSE.txt) for details.
