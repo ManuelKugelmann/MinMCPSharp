@@ -1,6 +1,9 @@
 # MinMCPSharp
 
-Lightweight [Model Context Protocol](https://modelcontextprotocol.io) (MCP) server and client for **.NET** and **Unity**. Attribute-based API, HTTP and stdio transports, minimal dependencies.
+Lightweight [Model Context Protocol](https://modelcontextprotocol.io) (MCP) server and client for **.NET** and **Unity**.
+- Attribute-based API
+- HTTP and stdio
+- Minimal dependencies
 
 ## Features
 
@@ -12,7 +15,6 @@ Lightweight [Model Context Protocol](https://modelcontextprotocol.io) (MCP) serv
 - **Cross-assembly tool loading** — register tools from external DLLs
 - Dynamic tool registration at runtime
 - Permission gate on client tool calls
-
 - Complex object parameters with automatic JSON Schema generation
 
 ## Dependencies
@@ -20,7 +22,6 @@ Lightweight [Model Context Protocol](https://modelcontextprotocol.io) (MCP) serv
 | Package | Purpose | Runtime deps |
 |---|---|---|
 | Newtonsoft.Json | JSON serialization | 0 |
-
 | PolySharp | C# 13 polyfills | compile-time only |
 
 ## Installation
