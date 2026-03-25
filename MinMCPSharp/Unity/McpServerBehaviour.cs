@@ -25,7 +25,21 @@ namespace MinMCPSharp
         [Header("Transport")]
         [SerializeField] private TransportType transportType = TransportType.Http;
 
+        [Header("Security")]
+        [Tooltip("Client IP allowlist (CIDR notation). Empty = no filtering. Loopback always allowed.")]
+        [SerializeField] private string[] allowedClients;
+
         public enum TransportType { Http, Stdio }
+
+        /// <summary>
+        /// Client IP allowlist. Supports individual IPs and CIDR notation
+        /// (e.g. "192.168.1.0/24"). Null/empty = no filtering. Loopback always allowed.
+        /// </summary>
+        public string[] AllowedClients
+        {
+            get => allowedClients;
+            set => allowedClients = value;
+        }
 
         private McpServer _server;
 
@@ -90,7 +104,10 @@ namespace MinMCPSharp
                     transport = new StdioTransport();
                     break;
                 default:
-                    transport = new HttpListenerTransport();
+                    var http = new HttpListenerTransport();
+                    if (allowedClients != null && allowedClients.Length > 0)
+                        http.AllowedClients = allowedClients;
+                    transport = http;
                     break;
             }
 
