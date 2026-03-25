@@ -12,7 +12,7 @@ Lightweight [Model Context Protocol](https://modelcontextprotocol.io) (MCP) serv
 - **Cross-assembly tool loading** — register tools from external DLLs
 - Dynamic tool registration at runtime
 - Permission gate on client tool calls
-- XML doc comment support for tool/parameter descriptions (via [LoxSmoke.DocXml](https://github.com/loxsmoke/DocXml))
+
 - Complex object parameters with automatic JSON Schema generation
 
 ## Dependencies
@@ -20,7 +20,7 @@ Lightweight [Model Context Protocol](https://modelcontextprotocol.io) (MCP) serv
 | Package | Purpose | Runtime deps |
 |---|---|---|
 | Newtonsoft.Json | JSON serialization | 0 |
-| LoxSmoke.DocXml | XML doc comment parsing | 0 |
+
 | PolySharp | C# 13 polyfills | compile-time only |
 
 ## Installation
@@ -178,16 +178,6 @@ public class MyExternalTool
 
 // In your server
 server.Register<MyExternalTool>();
-```
-
-## XML Documentation Support
-
-MinMCPSharp automatically extracts tool and parameter descriptions from XML doc comments. Enable in your `.csproj`:
-
-```xml
-<PropertyGroup>
-    <GenerateDocumentationFile>true</GenerateDocumentationFile>
-</PropertyGroup>
 ```
 
 ## Contributing
