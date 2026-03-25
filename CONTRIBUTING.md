@@ -12,7 +12,7 @@ By participating in this project, you agree to abide by our [Code of Conduct](CO
 
 ### Reporting Bugs
 
-If you find a bug, please open an issue and include detailed steps to reproduce the problem. Ensure the issue has not already been reported by searching the [issues list](https://github.com/afrise/MinMCPSharp/issues).
+If you find a bug, please open an issue and include detailed steps to reproduce the problem. Ensure the issue has not already been reported by searching the [issues list](https://github.com/ManuelKugelmann/MinMCPSharp/issues).
 
 ### Suggesting Enhancements
 

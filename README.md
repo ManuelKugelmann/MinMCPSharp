@@ -192,8 +192,8 @@ MinMCPSharp automatically extracts tool and parameter descriptions from XML doc 
 
 ## Contributing
 
-We welcome contributions! Please feel free to submit a Pull Request.
+We welcome contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
 ## License
 
-This project is licensed under the MIT License.
+This project is licensed under the MIT License — see [LICENSE.txt](LICENSE.txt) for details.
