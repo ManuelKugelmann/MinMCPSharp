@@ -192,7 +192,7 @@ MinMCPSharp automatically extracts tool and parameter descriptions from XML doc 
 
 ## Contributing
 
-We welcome contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+We welcome contributions! Please feel free to submit a pull request.
 
 ## Acknowledgements
 
