@@ -12,7 +12,7 @@ Lightweight [Model Context Protocol](https://modelcontextprotocol.io) (MCP) serv
 - **Cross-assembly tool loading** — register tools from external DLLs
 - Dynamic tool registration at runtime
 - Permission gate on client tool calls
-- XML doc comment support for tool/parameter descriptions (via [LoxSmoke.DocXml](https://github.com/loxsmoke/DocXml))
+
 - Complex object parameters with automatic JSON Schema generation
 
 ## Dependencies
@@ -20,7 +20,7 @@ Lightweight [Model Context Protocol](https://modelcontextprotocol.io) (MCP) serv
 | Package | Purpose | Runtime deps |
 |---|---|---|
 | Newtonsoft.Json | JSON serialization | 0 |
-| LoxSmoke.DocXml | XML doc comment parsing | 0 |
+
 | PolySharp | C# 13 polyfills | compile-time only |
 
 ## Installation
@@ -84,7 +84,18 @@ server.AddTool(new McpTool
 
 ## Unity Integration
 
-MinMCPSharp includes Unity-specific components behind `#if UNITY_5_3_OR_NEWER`:
+Copy the netstandard2.0 DLL and the two drop-in scripts into your Unity project:
+
+```
+Assets/
+  Plugins/
+    MinMCPSharp.dll              # netstandard2.0 build
+  Scripts/
+    McpServerBehaviour.cs        # MonoBehaviour wrapper
+    MainThreadDispatcher.cs      # Main-thread dispatch helper
+```
+
+The CI build produces a ready-to-use `MinMCPSharp.Unity` artifact with these files.
 
 ```csharp
 // Option A: Inspector-driven
@@ -96,9 +107,9 @@ behaviour.Register<MyGameTools>();
 behaviour.StartServer();
 ```
 
-The `McpServerBehaviour` handles lifecycle (Awake/OnDestroy) and optionally dispatches tool calls to Unity's main thread via `MainThreadDispatcher`.
+`McpServerBehaviour` handles lifecycle (Awake/OnDestroy) and optionally dispatches tool calls to Unity's main thread via `MainThreadDispatcher`.
 
-**Platform support:** The HTTP transport uses `System.Net.HttpListener`, which works on Windows and macOS desktop builds (both Mono and IL2CPP). For mobile or WebGL targets where `HttpListener` is unavailable, a `TcpListenerTransport` with raw HTTP parsing could be added in the future.
+**Platform note:** The HTTP transport uses `System.Net.HttpListener`, which works on Windows and macOS desktop builds (both Mono and IL2CPP). `HttpListener` is **not available** on iOS, Android, or WebGL — on these platforms you will need a custom transport implementing `IMcpTransport`.
 
 ## API Reference
 
@@ -180,20 +191,14 @@ public class MyExternalTool
 server.Register<MyExternalTool>();
 ```
 
-## XML Documentation Support
-
-MinMCPSharp automatically extracts tool and parameter descriptions from XML doc comments. Enable in your `.csproj`:
-
-```xml
-<PropertyGroup>
-    <GenerateDocumentationFile>true</GenerateDocumentationFile>
-</PropertyGroup>
-```
-
 ## Contributing
 
-We welcome contributions! Please feel free to submit a Pull Request.
+We welcome contributions! Please feel free to submit a pull request.
+
+## Acknowledgements
+
+This project is derived from [afrise/MCPSharp](https://github.com/afrise/MCPSharp).
 
 ## License
 
-This project is licensed under the MIT License.
+This project is licensed under the MIT License — see [LICENSE.txt](LICENSE.txt) for details.
