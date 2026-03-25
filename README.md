@@ -84,7 +84,18 @@ server.AddTool(new McpTool
 
 ## Unity Integration
 
-MinMCPSharp includes Unity-specific components behind `#if UNITY_5_3_OR_NEWER`:
+Copy the netstandard2.0 DLL and the two drop-in scripts into your Unity project:
+
+```
+Assets/
+  Plugins/
+    MinMCPSharp.dll              # netstandard2.0 build
+  Scripts/
+    McpServerBehaviour.cs        # MonoBehaviour wrapper
+    MainThreadDispatcher.cs      # Main-thread dispatch helper
+```
+
+The CI build produces a ready-to-use `MinMCPSharp.Unity` artifact with these files.
 
 ```csharp
 // Option A: Inspector-driven
@@ -96,9 +107,9 @@ behaviour.Register<MyGameTools>();
 behaviour.StartServer();
 ```
 
-The `McpServerBehaviour` handles lifecycle (Awake/OnDestroy) and optionally dispatches tool calls to Unity's main thread via `MainThreadDispatcher`.
+`McpServerBehaviour` handles lifecycle (Awake/OnDestroy) and optionally dispatches tool calls to Unity's main thread via `MainThreadDispatcher`.
 
-**Platform support:** The HTTP transport uses `System.Net.HttpListener`, which works on Windows and macOS desktop builds (both Mono and IL2CPP). For mobile or WebGL targets where `HttpListener` is unavailable, a `TcpListenerTransport` with raw HTTP parsing could be added in the future.
+**Platform support:** The HTTP transport uses `System.Net.HttpListener`, which works on Windows and macOS desktop builds (both Mono and IL2CPP). For mobile or WebGL targets where `HttpListener` is unavailable, a custom transport implementing `IMcpTransport` can be used.
 
 ## API Reference
 
