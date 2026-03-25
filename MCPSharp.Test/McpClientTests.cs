@@ -13,7 +13,7 @@ namespace MCPSharp.Test
         [ClassInitialize]
         public static async Task ClassInitialize(TestContext context)
         {
-            _port = 18800 + Random.Shared.Next(100);
+            _port = TestPortAllocator.GetPort();
             _server = new McpServer("ClientTestServer", "1.0.0");
             _server.Register<MCPDev>();
             _server.Start("localhost", _port);

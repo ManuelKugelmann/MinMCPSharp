@@ -4,37 +4,49 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: 'Version number (e.g., 1.0.0)'
+        description: 'Version number (e.g., 1.0.0 or 1.0.0-beta.1)'
         required: true
         type: string
+      prerelease:
+        description: 'Pre-release?'
+        required: false
+        type: boolean
+        default: false
 
 jobs:
   build-and-publish:
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/master'
+    if: github.ref == 'refs/heads/master' || (github.event.inputs.prerelease == 'true' && github.ref == 'refs/heads/development')
 
     steps:
     - uses: actions/checkout@v4
-    
+
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: '9.0.x'
-        
+
     - name: Restore dependencies
       run: dotnet restore MCPSharp/MCPSharp.csproj
-      
+
     - name: Build
       run: dotnet build MCPSharp/MCPSharp.csproj --no-restore --configuration Release
-      
+
     - name: Test
-      run: dotnet test MCPSharp/MCPSharp.csproj --no-build --configuration Release --verbosity normal
-      
+      run: dotnet test --no-build --configuration Release --verbosity normal
+
     - name: Pack
       run: dotnet pack MCPSharp/MCPSharp.csproj --no-build --configuration Release -p:PackageVersion=${{ github.event.inputs.version }} --output nupkgs
-      
-    - name: Push to NuGet
-      run: dotnet nuget push nupkgs/MCPSharp.${{ github.event.inputs.version }}.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
+
+    # - name: Push to NuGet
+    #   run: dotnet nuget push nupkgs/MCPSharp.${{ github.event.inputs.version }}.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
+
+    - name: Stage Unity package
+      run: |
+        mkdir -p unity-package/MCPSharp/Scripts
+        cp MCPSharp/bin/Release/netstandard2.0/MCPSharp.dll unity-package/MCPSharp/
+        cp MCPSharp/Unity/*.cs unity-package/MCPSharp/Scripts/
+        cd unity-package && zip -r ../MCPSharp.Unity.${{ github.event.inputs.version }}.zip MCPSharp/
 
     - name: Publish Github release
       id: create_release
@@ -47,9 +59,9 @@ jobs:
         body: |
           Release of MCPSharp version ${{ github.event.inputs.version }}
         draft: false
-        prerelease: false
+        prerelease: ${{ github.event.inputs.prerelease }}
 
-    - name: Upload Release Asset
+    - name: Upload NuGet package
       uses: actions/upload-release-asset@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -57,4 +69,14 @@ jobs:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
         asset_path: nupkgs/MCPSharp.${{ github.event.inputs.version }}.nupkg
         asset_name: MCPSharp.${{ github.event.inputs.version }}.nupkg
+        asset_content_type: application/zip
+
+    - name: Upload Unity package
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: MCPSharp.Unity.${{ github.event.inputs.version }}.zip
+        asset_name: MCPSharp.Unity.${{ github.event.inputs.version }}.zip
         asset_content_type: application/zip

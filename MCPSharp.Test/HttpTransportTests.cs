@@ -17,7 +17,7 @@ namespace MCPSharp.Test
         [ClassInitialize]
         public static void ClassInitialize(TestContext context)
         {
-            _port = 18900 + Random.Shared.Next(100);
+            _port = TestPortAllocator.GetPort();
             _server = new McpServer("TestServer", "1.0.0");
             _server.Register<MCPDev>();
 

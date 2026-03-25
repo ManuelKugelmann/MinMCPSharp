@@ -23,11 +23,20 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="..\README.md" Pack="true" PackagePath="\" />
+    <InternalsVisibleTo Include="MCPSharp.Test" />
   </ItemGroup>
 
   <ItemGroup>
-<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <None Include="..\README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
+
+  <!-- Exclude Unity drop-in scripts from library compilation -->
+  <ItemGroup>
+    <Compile Remove="Unity\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="PolySharp" Version="1.15.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>

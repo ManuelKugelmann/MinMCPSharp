@@ -1,4 +1,3 @@
-#if UNITY_5_3_OR_NEWER
 using System;
 using System.Collections.Concurrent;
 using System.Threading;
@@ -10,6 +9,9 @@ namespace MCPSharp
     /// <summary>
     /// Dispatches work to Unity's main thread via Update().
     /// Attach to a GameObject or let McpServerBehaviour create one.
+    ///
+    /// Drop-in script: copy this file and McpServerBehaviour.cs into your
+    /// Unity project alongside the MCPSharp netstandard2.0 DLL.
     /// </summary>
     public class MainThreadDispatcher : MonoBehaviour
     {
@@ -92,4 +94,3 @@ namespace MCPSharp
         }
     }
 }
-#endif

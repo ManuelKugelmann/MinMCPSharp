@@ -1,4 +1,3 @@
-#if UNITY_5_3_OR_NEWER
 using System.Reflection;
 using UnityEngine;
 
@@ -8,6 +7,9 @@ namespace MCPSharp
     /// Unity MonoBehaviour wrapper for McpServer.
     /// Handles lifecycle (Awake/OnDestroy) and main-thread dispatch.
     /// Add to a GameObject or use McpServerBehaviour.Create().
+    ///
+    /// Drop-in script: copy this file and MainThreadDispatcher.cs into your
+    /// Unity project alongside the MCPSharp netstandard2.0 DLL.
     /// </summary>
     [AddComponentMenu("MCPSharp/MCP Server")]
     public class McpServerBehaviour : MonoBehaviour
@@ -33,7 +35,7 @@ namespace MCPSharp
         // -- Static factory -----------------------------------------------
 
         public static McpServerBehaviour Create(string name = "MCPSharp",
-            string version = "1.0.0", int port = 8080)
+            string version = "1.0.0", int port = 8080, string endpoint = "localhost")
         {
             var go = new GameObject("[MCPSharp-Server]");
             DontDestroyOnLoad(go);
@@ -41,6 +43,7 @@ namespace MCPSharp
             behaviour.serverName = name;
             behaviour.serverVersion = version;
             behaviour.port = port;
+            behaviour.endpoint = endpoint;
             behaviour.startOnAwake = false;
             return behaviour;
         }
@@ -132,4 +135,3 @@ namespace MCPSharp
         }
     }
 }
-#endif
