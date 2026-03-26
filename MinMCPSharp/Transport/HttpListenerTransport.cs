@@ -58,9 +58,30 @@ namespace MinMCPSharp
             _cts = new CancellationTokenSource();
             _listener = new HttpListener();
 
-            var prefix = string.Format("http://{0}:{1}/", endpoint, port);
-            _listener.Prefixes.Add(prefix);
-            _listener.Start();
+            if (endpoint == "localhost" || endpoint == "127.0.0.1")
+            {
+                _listener.Prefixes.Add(string.Format("http://localhost:{0}/", port));
+                _listener.Prefixes.Add(string.Format("http://127.0.0.1:{0}/", port));
+                try
+                {
+                    _listener.Prefixes.Add(string.Format("http://[::1]:{0}/", port));
+                    _listener.Start();
+                }
+                catch (HttpListenerException)
+                {
+                    // IPv6 loopback prefix not supported on this platform; retry without it
+                    _listener.Close();
+                    _listener = new HttpListener();
+                    _listener.Prefixes.Add(string.Format("http://localhost:{0}/", port));
+                    _listener.Prefixes.Add(string.Format("http://127.0.0.1:{0}/", port));
+                    _listener.Start();
+                }
+            }
+            else
+            {
+                _listener.Prefixes.Add(string.Format("http://{0}:{1}/", endpoint, port));
+                _listener.Start();
+            }
             IsRunning = true;
 
             _thread = new Thread(ListenLoop)
