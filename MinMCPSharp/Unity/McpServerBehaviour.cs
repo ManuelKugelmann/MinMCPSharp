@@ -19,7 +19,7 @@ namespace MinMCPSharp
         [SerializeField] private string serverVersion = "1.0.0";
         [SerializeField] private int port = 8080;
         [SerializeField] private string endpoint = "localhost";
-        [SerializeField] private bool startOnAwake = true;
+        [SerializeField] private bool startOnAwake = false;
         [SerializeField] private bool dispatchOnMainThread = true;
 
         [Header("Transport")]
