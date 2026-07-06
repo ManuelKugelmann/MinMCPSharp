@@ -31,12 +31,20 @@ namespace MinMCPSharp
         /// </summary>
         public Func<Func<Task<string>>, Task<string>> DispatchWrapper;
 
+        /// <summary>
+        /// Optional briefing returned as the MCP `instructions` field of the
+        /// initialize result. Evaluated per initialize request (runs inside
+        /// DispatchWrapper like all requests). Null: field omitted.
+        /// </summary>
+        public Func<string> Instructions;
+
         public McpServer(string name = "MinMCPSharp", string version = "1.0.0")
         {
             ServerName = name;
             ServerVersion = version;
             _router = new McpRouter(_tools, _resources,
-                new McpImplementation(name, version));
+                new McpImplementation(name, version),
+                () => Instructions != null ? Instructions() : null);
         }
 
         // -- Registration -------------------------------------------------

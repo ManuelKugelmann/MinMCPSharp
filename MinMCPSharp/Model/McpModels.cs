@@ -115,6 +115,9 @@ namespace MinMCPSharp
         [JsonProperty("protocolVersion")] public string ProtocolVersion;
         [JsonProperty("capabilities")]    public McpServerCapabilities Capabilities;
         [JsonProperty("serverInfo")]      public McpImplementation ServerInfo;
+        // MCP spec: optional server briefing injected into the client agent's
+        // context. Omitted from the wire when null (NullValueHandling.Ignore).
+        [JsonProperty("instructions")]    public string Instructions;
     }
 
     public class McpServerCapabilities

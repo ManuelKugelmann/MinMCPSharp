@@ -107,6 +107,26 @@ namespace MinMCPSharp.Test
             Assert.AreEqual("2025-03-26", result["result"]!["protocolVersion"]!.ToString());
         }
 
+        [TestMethod("HandleRequestAsync - initialize omits instructions when no provider")]
+        public async Task Test_InitializeNoInstructions()
+        {
+            var req = MakeRequest("initialize");
+            var response = await _router.HandleRequestAsync(req.ToString());
+            var result = JObject.Parse(response);
+            Assert.IsNull(result["result"]!["instructions"]);
+        }
+
+        [TestMethod("HandleRequestAsync - initialize returns instructions from provider")]
+        public async Task Test_InitializeWithInstructions()
+        {
+            var router = new McpRouter(new ToolManager(), new ResourceManager(),
+                new McpImplementation("RouterTest", "1.0.0"), () => "server briefing");
+            var req = MakeRequest("initialize");
+            var response = await router.HandleRequestAsync(req.ToString());
+            var result = JObject.Parse(response);
+            Assert.AreEqual("server briefing", result["result"]!["instructions"]!.ToString());
+        }
+
         [TestMethod("HandleRequestAsync - tools/list returns registered tools")]
         public async Task Test_ToolsList()
         {

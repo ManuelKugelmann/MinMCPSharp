@@ -17,6 +17,7 @@ namespace MinMCPSharp
         private readonly ToolManager _tools;
         private readonly ResourceManager _resources;
         private readonly McpImplementation _serverInfo;
+        private readonly Func<string> _instructions;
 
         private static readonly JsonSerializerSettings SerializerSettings = new JsonSerializerSettings
         {
@@ -24,11 +25,13 @@ namespace MinMCPSharp
             Formatting = Formatting.None
         };
 
-        internal McpRouter(ToolManager tools, ResourceManager resources, McpImplementation serverInfo)
+        internal McpRouter(ToolManager tools, ResourceManager resources, McpImplementation serverInfo,
+            Func<string> instructions = null)
         {
             _tools = tools;
             _resources = resources;
             _serverInfo = serverInfo;
+            _instructions = instructions;
         }
 
         /// <summary>
@@ -107,7 +110,9 @@ namespace MinMCPSharp
                     Tools = new Dictionary<string, bool> { { "listChanged", true } },
                     Resources = new Dictionary<string, bool> { { "listChanged", false } }
                 },
-                ServerInfo = _serverInfo
+                ServerInfo = _serverInfo,
+                // Evaluated per request so a hot-reloaded briefing stays current.
+                Instructions = _instructions != null ? _instructions() : null
             };
         }
 
